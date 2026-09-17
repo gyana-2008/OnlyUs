@@ -62,7 +62,7 @@ def get_active_couple(
     """Ensure user is part of an active couple connection."""
     conn = db.query(CoupleConnection).filter(
         ((CoupleConnection.requester_id == current_user.id) | (CoupleConnection.recipient_id == current_user.id)),
-        CoupleConnection.status == "accepted"
+        CoupleConnection.status.in_(["active", "accepted"])
     ).first()
 
     if not conn:

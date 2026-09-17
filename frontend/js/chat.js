@@ -14,7 +14,7 @@ let recordTimerInterval = null;
 let currentAudioPlaying = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
-  if (!API.isAuthenticated()) {
+  if (!API.isAuthenticated() || !API.isPrivateUnlocked()) {
     window.location.href = '/';
     return;
   }

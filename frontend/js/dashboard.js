@@ -7,8 +7,8 @@ let timerInterval = null;
 let relationshipStartDate = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Ensure authenticated
-  if (!API.isAuthenticated()) {
+  // Ensure authenticated AND private unlocked
+  if (!API.isAuthenticated() || !API.isPrivateUnlocked()) {
     window.location.href = '/';
     return;
   }
@@ -23,6 +23,11 @@ async function loadDashboard() {
     const conn = data.connection;
 
     renderUserHeader(user);
+
+    if (user.is_demo) {
+      const demoPill = document.getElementById('demo-mode-pill');
+      if (demoPill) demoPill.style.display = 'inline-block';
+    }
 
     if (!conn) {
       // Not connected to a partner yet
@@ -66,6 +71,16 @@ function showConnectedSpace(user, conn) {
     document.getElementById('partner-uid-badge').textContent = partner.uid;
     document.getElementById('partner-avatar-img').src = partner.avatar_url;
     document.getElementById('partner-status-text').textContent = partner.status_message || 'Active';
+
+    const activePartnerName = document.getElementById('active-partner-name');
+    if (activePartnerName) activePartnerName.textContent = partner.display_name;
+
+    const activeConnectedSince = document.getElementById('active-connected-since');
+    if (activeConnectedSince && conn.relationship_start_date) {
+      const d = new Date(conn.relationship_start_date);
+      const options = { day: 'numeric', month: 'long', year: 'numeric' };
+      activeConnectedSince.textContent = d.toLocaleDateString('en-GB', options);
+    }
   }
 
   // Initialize live relationship timer
@@ -214,14 +229,14 @@ async function loadPendingRequests() {
 
     if (res.incoming && res.incoming.length > 0) {
       incomingList.innerHTML = res.incoming.map(req => `
-        <div style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); margin-bottom: 0.75rem;">
-          <div>
-            <strong>${req.requester.display_name}</strong>
-            <span style="font-size: 0.8rem; color: var(--text-accent); margin-left: 0.5rem;">${req.requester.uid}</span>
-          </div>
-          <div style="display: flex; gap: 0.5rem;">
-            <button class="btn btn-primary btn-sm" onclick="acceptRequest(${req.id})">Accept</button>
-            <button class="btn btn-secondary btn-sm" onclick="rejectRequest(${req.id})">Decline</button>
+        <div class="couple-request-card" style="padding: 1.25rem; background: var(--bg-card); border: 1px solid var(--border-accent); border-radius: var(--radius-md); margin-bottom: 0.85rem; text-align: left;">
+          <div style="font-size: 0.95rem; font-weight: 700; color: var(--accent-gold); margin-bottom: 0.35rem;">💌 Couple Request</div>
+          <p style="margin-bottom: 1rem; font-size: 0.95rem; color: var(--text-primary);">
+            <strong>${req.requester.display_name}</strong> wants to connect with you.
+          </p>
+          <div style="display: flex; gap: 0.75rem;">
+            <button class="btn btn-primary btn-sm" id="btn-accept-req-${req.id}" onclick="acceptRequest(${req.id})" style="padding: 0.5rem 1.25rem;">ACCEPT</button>
+            <button class="btn btn-outline btn-sm" id="btn-reject-req-${req.id}" onclick="rejectRequest(${req.id})" style="padding: 0.5rem 1.25rem; color: var(--text-muted);">REJECT</button>
           </div>
         </div>
       `).join('');

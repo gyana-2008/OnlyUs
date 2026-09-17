@@ -3,8 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BETWEEN — Stay informed. Stay connected.</title>
+  <title>BETWEEN — Stay Informed. Stay Connected.</title>
   <meta name="description" content="A modern, independent news publication delivering rigorous journalism across world affairs, science, technology, and culture." />
+  
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/favicon-180.png" />
+  <link rel="shortcut icon" href="/assets/images/favicon.ico" />
   
   <link rel="stylesheet" href="/css/base.css" />
   <link rel="stylesheet" href="/css/news.css" />
@@ -22,10 +27,6 @@
       </div>
       <div class="edition-select-wrap">
         <span class="edition-indicator">EDITION: GLOBAL</span>
-        <!-- Subtle discreet glyph trigger for Private Access -->
-        <span class="secret-glyph-trigger" id="secret-glyph" title="Edition switch" role="button" tabindex="0" aria-label="Private Access">
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></svg>
-        </span>
       </div>
     </div>
   </aside>
@@ -38,8 +39,11 @@
           <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">EST. 2025</span>
         </div>
         
-        <div class="brand-logo-area">
-          <h1 class="brand-title" id="brand-title-trigger" title="BETWEEN">BETWEEN</h1>
+        <div class="brand-logo-area" id="brand-title-trigger" role="button" tabindex="0" title="BETWEEN — Stay informed. Stay connected.">
+          <div class="brand-emblem-wrap">
+            <img src="/assets/images/between-emblem.png" alt="B" class="brand-emblem-img" />
+          </div>
+          <h1 class="brand-title">BETWEEN</h1>
           <p class="brand-tagline">Stay informed. Stay connected.</p>
         </div>
 
@@ -171,65 +175,198 @@
     </div>
   </div>
 
-  <!-- Discreet Secret Access Modal -->
+  <!-- Hidden Private Space Modal -->
   <div class="modal-overlay" id="secret-access-modal">
-    <div class="modal-content">
-      <button class="modal-close" id="secret-modal-close">✕</button>
+    <div class="modal-content gateway-modal-content" style="max-width: 440px;">
+      <button class="modal-close" id="secret-modal-close" onclick="closeSecretModal()">✕</button>
 
-      <!-- View 1: Discreet Login View -->
-      <div id="secret-auth-view">
-        <h2 class="secret-modal-title">Subscriber Access</h2>
-        <p class="secret-modal-subtitle">Sign in to unlock personalized editions and private archives.</p>
-        <form onsubmit="handleSecretLogin(event)">
+      <!-- View 1: Gateway Selection Screen (DEMO OR REAL) -->
+      <div id="secret-choice-view">
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+          <img src="/assets/images/between-emblem.png" alt="Between" style="height: 48px; width: 48px; border-radius: 12px; border: 1px solid rgba(197, 160, 89, 0.4); object-fit: cover; margin-bottom: 0.75rem; box-shadow: 0 4px 14px rgba(0,0,0,0.4);" />
+          <h2 class="secret-modal-title" style="letter-spacing: 0.08em; text-transform: uppercase; font-size: 1.35rem; margin-bottom: 0.35rem;">Choose Account Mode</h2>
+          <p class="secret-modal-subtitle" style="margin-bottom: 0; color: var(--text-secondary); font-size: 0.88rem;">Select how you wish to access the private space</p>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+          <button class="btn btn-primary" id="btn-choice-demo" onclick="selectDemoAccount()" style="padding: 0.85rem; font-size: 0.95rem; letter-spacing: 0.05em; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; text-transform: uppercase;">
+            <span>Demo Account</span>
+            <span style="font-size: 0.75rem; font-weight: normal; opacity: 0.85; text-transform: none; letter-spacing: normal;">Explore Between with test couple Alex & Maya.</span>
+          </button>
+          <button class="btn btn-secondary" id="btn-choice-real" onclick="selectRealAccount()" style="padding: 0.85rem; font-size: 0.95rem; letter-spacing: 0.05em; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; text-transform: uppercase;">
+            <span>Real Account</span>
+            <span style="font-size: 0.75rem; font-weight: normal; opacity: 0.85; text-transform: none; letter-spacing: normal;">Access your private space or sign in to your real account.</span>
+          </button>
+          <button class="btn btn-outline" id="btn-choice-cancel" onclick="closeSecretModal()" style="padding: 0.75rem; font-size: 0.85rem; justify-content: center; color: var(--text-muted);">
+            CANCEL
+          </button>
+        </div>
+      </div>
+
+      <!-- View 2A: CASE A — VALID LOGIN EXISTS (PRIVATE UNLOCK WITH PIN) -->
+      <div id="secret-pin-view" style="display: none;">
+        <div style="text-align: center; margin-bottom: 1.25rem;">
+          <h2 class="secret-modal-title" style="letter-spacing: 0.08em; text-transform: uppercase; font-size: 1.35rem; margin-bottom: 0.35rem;">PRIVATE UNLOCK</h2>
+          <p class="secret-modal-subtitle" style="margin-bottom: 0; color: var(--text-secondary); font-size: 0.9rem;">Enter your PIN</p>
+        </div>
+
+        <div id="pin-error-msg" style="display: none; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; padding: 0.6rem 0.8rem; border-radius: var(--radius-sm); font-size: 0.82rem; text-align: center; margin-bottom: 1rem;"></div>
+
+        <div class="pin-pad-container">
+          <div class="pin-dots-display">
+            <div class="pin-dot" id="dot-0"></div>
+            <div class="pin-dot" id="dot-1"></div>
+            <div class="pin-dot" id="dot-2"></div>
+            <div class="pin-dot" id="dot-3"></div>
+          </div>
+
+          <div class="pin-keypad-grid">
+            <button type="button" class="pin-key-btn" data-val="1">1</button>
+            <button type="button" class="pin-key-btn" data-val="2">2</button>
+            <button type="button" class="pin-key-btn" data-val="3">3</button>
+            <button type="button" class="pin-key-btn" data-val="4">4</button>
+            <button type="button" class="pin-key-btn" data-val="5">5</button>
+            <button type="button" class="pin-key-btn" data-val="6">6</button>
+            <button type="button" class="pin-key-btn" data-val="7">7</button>
+            <button type="button" class="pin-key-btn" data-val="8">8</button>
+            <button type="button" class="pin-key-btn" data-val="9">9</button>
+            <button type="button" class="pin-key-btn" data-val="clear" style="font-size: 0.85rem;">C</button>
+            <button type="button" class="pin-key-btn" data-val="0">0</button>
+            <button type="button" class="pin-key-btn" data-val="back">⌫</button>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem;">
+          <button type="button" class="btn btn-primary" id="btn-pin-unlock" onclick="submitCurrentPin()" style="flex: 1; justify-content: center;">
+            Unlock
+          </button>
+          <button type="button" class="btn btn-outline" id="btn-pin-cancel" onclick="closeSecretModal()" style="flex: 1; justify-content: center; color: var(--text-muted);">
+            Cancel
+          </button>
+        </div>
+      </div>
+
+      <!-- View 2B: CASE B — NO VALID LOGIN EXISTS (LOGIN / REGISTER / CANCEL) -->
+      <div id="secret-unauth-view" style="display: none;">
+        <div style="text-align: center; margin-bottom: 1.75rem;">
+          <h2 class="secret-modal-title" style="letter-spacing: 0.08em; text-transform: uppercase; font-size: 1.35rem; margin-bottom: 0.35rem;">PRIVATE SPACE</h2>
+          <p class="secret-modal-subtitle" style="margin-bottom: 0; color: var(--text-secondary); font-size: 0.9rem;">Sign in or create your authentic account.</p>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+          <button class="btn btn-primary" id="btn-unauth-login" onclick="showRealLoginForm()" style="padding: 0.9rem; font-size: 0.95rem; letter-spacing: 0.05em; justify-content: center;">
+            LOGIN
+          </button>
+          <button class="btn btn-secondary" id="btn-unauth-register" onclick="showRealRegisterForm()" style="padding: 0.9rem; font-size: 0.95rem; letter-spacing: 0.05em; justify-content: center;">
+            REGISTER
+          </button>
+          <button class="btn btn-outline" id="btn-unauth-cancel" onclick="closeSecretModal()" style="padding: 0.8rem; font-size: 0.85rem; justify-content: center; color: var(--text-muted);">
+            CANCEL
+          </button>
+        </div>
+      </div>
+
+      <!-- View 3A: Real Login Form -->
+      <div id="secret-login-view" style="display: none;">
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+          <h2 class="secret-modal-title" style="letter-spacing: 0.08em; text-transform: uppercase; font-size: 1.35rem; margin-bottom: 0.35rem;">PRIVATE SPACE</h2>
+          <p class="secret-modal-subtitle" style="margin-bottom: 0; color: var(--text-secondary); font-size: 0.85rem;">Sign In to Real Account</p>
+        </div>
+
+        <div id="login-error-msg" style="display: none; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; padding: 0.6rem 0.8rem; border-radius: var(--radius-sm); font-size: 0.82rem; text-align: center; margin-bottom: 1rem;"></div>
+
+        <form onsubmit="handleRealLoginSubmit(event)">
           <div style="margin-bottom: 1rem;">
-            <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">UID, Email, or Username</label>
-            <input type="text" id="secret-login-ident" style="width: 100%;" placeholder="e.g. BT-XXXXXX or email" required />
+            <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">Email, Mobile, or User ID</label>
+            <input type="text" id="real-login-ident" style="width: 100%;" placeholder="e.g. BT-XXXXXX, email, or phone" required />
           </div>
           <div style="margin-bottom: 1.5rem;">
             <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">Password</label>
-            <input type="password" id="secret-login-pwd" style="width: 100%;" placeholder="••••••••" required />
+            <input type="password" id="real-login-pwd" style="width: 100%;" placeholder="••••••••" required />
           </div>
-          <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">Verify & Enter</button>
-          <div style="text-align: center; font-size: 0.85rem; color: var(--text-muted);">
-            Need a secure account? <a href="/register.html" style="color: var(--text-accent);">Register here</a>
+
+          <div style="display: flex; gap: 0.75rem;">
+            <button type="submit" class="btn btn-primary" style="flex: 1; justify-content: center;">LOGIN</button>
+            <button type="button" class="btn btn-outline" onclick="showView('secret-unauth-view')" style="flex: 1; justify-content: center; color: var(--text-muted);">CANCEL</button>
           </div>
         </form>
       </div>
 
-      <!-- View 2: PIN Unlock Keypad -->
-      <div id="secret-pin-view" style="display: none;">
-        <h2 class="secret-modal-title">Private Verification</h2>
-        <p class="secret-modal-subtitle">Enter your 4-digit PIN to open your private space.</p>
-        
-        <div class="pin-pad-container">
-          <div class="pin-dots-display">
-            <div class="pin-dot"></div>
-            <div class="pin-dot"></div>
-            <div class="pin-dot"></div>
-            <div class="pin-dot"></div>
-          </div>
-
-          <div class="pin-keypad-grid">
-            <button class="pin-key-btn" data-val="1">1</button>
-            <button class="pin-key-btn" data-val="2">2</button>
-            <button class="pin-key-btn" data-val="3">3</button>
-            <button class="pin-key-btn" data-val="4">4</button>
-            <button class="pin-key-btn" data-val="5">5</button>
-            <button class="pin-key-btn" data-val="6">6</button>
-            <button class="pin-key-btn" data-val="7">7</button>
-            <button class="pin-key-btn" data-val="8">8</button>
-            <button class="pin-key-btn" data-val="9">9</button>
-            <button class="pin-key-btn" data-val="clear" style="font-size: 0.9rem;">C</button>
-            <button class="pin-key-btn" data-val="0">0</button>
-            <button class="pin-key-btn" data-val="back">⌫</button>
-          </div>
+      <!-- View 3B: Real Registration Form -->
+      <div id="secret-register-view" style="display: none;">
+        <div style="text-align: center; margin-bottom: 1.25rem;">
+          <h2 class="secret-modal-title" style="letter-spacing: 0.08em; text-transform: uppercase; font-size: 1.35rem; margin-bottom: 0.35rem;">PRIVATE SPACE</h2>
+          <p class="secret-modal-subtitle" style="margin-bottom: 0; color: var(--text-secondary); font-size: 0.85rem;">Register Real Account</p>
         </div>
 
-        <div style="display: flex; justify-content: center; margin-top: 1rem;">
-          <button class="btn btn-outline btn-sm" id="biometric-unlock-btn" onclick="triggerBiometricUnlock()" style="display: none;">
-            <span>🛡️</span> Unlock with Passkey / Biometrics
-          </button>
+        <div id="reg-error-msg" style="display: none; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; padding: 0.6rem 0.8rem; border-radius: var(--radius-sm); font-size: 0.82rem; text-align: center; margin-bottom: 1rem;"></div>
+
+        <form onsubmit="handleRealRegisterSubmit(event)">
+          <div style="margin-bottom: 0.75rem;">
+            <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.3rem;">Profile Name</label>
+            <input type="text" id="real-reg-name" style="width: 100%;" placeholder="e.g. Alex" required />
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+            <div>
+              <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.3rem;">Unique User ID</label>
+              <input type="text" id="real-reg-uid" style="width: 100%; text-transform: uppercase;" placeholder="BT-XXXXXX" required />
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.3rem;">Email or Mobile</label>
+              <input type="text" id="real-reg-contact" style="width: 100%;" placeholder="email or phone" required />
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+            <div>
+              <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.3rem;">Password</label>
+              <input type="password" id="real-reg-pwd" style="width: 100%;" placeholder="••••••••" required />
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.3rem;">Confirm</label>
+              <input type="password" id="real-reg-confirm" style="width: 100%;" placeholder="••••••••" required />
+            </div>
+          </div>
+
+          <div style="margin-bottom: 1.25rem;">
+            <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.3rem;">About / Bio (Optional)</label>
+            <input type="text" id="real-reg-bio" style="width: 100%;" placeholder="Short description" />
+          </div>
+
+          <div style="display: flex; gap: 0.75rem;">
+            <button type="submit" class="btn btn-primary" style="flex: 1; justify-content: center;">REGISTER</button>
+            <button type="button" class="btn btn-outline" onclick="showView('secret-unauth-view')" style="flex: 1; justify-content: center; color: var(--text-muted);">CANCEL</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- View 3C: Force Create / Setup Private PIN -->
+      <div id="secret-setup-pin-view" style="display: none;">
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+          <h2 class="secret-modal-title" style="letter-spacing: 0.08em; text-transform: uppercase; font-size: 1.35rem; margin-bottom: 0.35rem;">CREATE PRIVATE PIN</h2>
+          <p class="secret-modal-subtitle" style="margin-bottom: 0; color: var(--text-secondary); font-size: 0.85rem;">Set a 4-digit PIN required to unlock your private space.</p>
         </div>
+
+        <div id="setup-pin-error-msg" style="display: none; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; padding: 0.6rem 0.8rem; border-radius: var(--radius-sm); font-size: 0.82rem; text-align: center; margin-bottom: 1rem;"></div>
+
+        <form onsubmit="handleSetupPinSubmit(event)">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.5rem;">
+            <div>
+              <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">4-Digit PIN</label>
+              <input type="password" id="setup-new-pin" maxlength="8" placeholder="••••" style="width: 100%; text-align: center; font-size: 1.2rem; letter-spacing: 0.2em;" required />
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">Confirm PIN</label>
+              <input type="password" id="setup-confirm-pin" maxlength="8" placeholder="••••" style="width: 100%; text-align: center; font-size: 1.2rem; letter-spacing: 0.2em;" required />
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem;">
+            <button type="submit" class="btn btn-primary" style="flex: 1; justify-content: center;">SAVE PIN & ENTER</button>
+            <button type="button" class="btn btn-outline" onclick="closeSecretModal()" style="flex: 1; justify-content: center; color: var(--text-muted);">CANCEL</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>

@@ -56,3 +56,18 @@ def test_live_server_endpoints():
     news_res = requests.get(base + "/api/news")
     assert news_res.status_code == 200
     assert news_res.json()["count"] > 0
+
+    # Verify Hidden Entry Point on Public News Page
+    home_res = requests.get(base + "/")
+    assert home_res.status_code == 200
+    home_html = home_res.text
+    # 1. Masthead brand logo trigger must exist
+    assert 'id="brand-title-trigger"' in home_html
+    # 2. Secret glyph trigger must NOT exist in the public edition bar
+    assert 'secret-glyph-trigger' not in home_html
+    # 3. Private space selection modal markup must exist
+    assert 'id="secret-choice-view"' in home_html
+    assert 'Demo Account' in home_html
+    assert 'Real Account' in home_html
+    # 4. Public HTML must NOT render DEV DEMO banner
+    assert 'dev-demo-banner' not in home_html

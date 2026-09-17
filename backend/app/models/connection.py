@@ -12,7 +12,7 @@ class CoupleConnection(Base):
     id = Column(Integer, primary_key=True, index=True)
     requester_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     recipient_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    status = Column(String(32), default="pending", nullable=False) # 'pending', 'accepted', 'rejected', 'disconnected'
+    status = Column(String(32), default="pending", nullable=False) # 'pending', 'active', 'accepted', 'ended', 'rejected'
     
     # Relationship milestone timer settings
     relationship_start_date = Column(DateTime, nullable=True) # e.g. 2024-10-14 00:00:00
@@ -28,6 +28,10 @@ class CoupleConnection(Base):
     messages = relationship("Message", back_populates="connection", cascade="all, delete-orphan")
     memories = relationship("Memory", back_populates="connection", cascade="all, delete-orphan")
     notes = relationship("SharedNote", back_populates="connection", cascade="all, delete-orphan")
+
+    @property
+    def is_active(self) -> bool:
+        return self.status in ("active", "accepted")
 
     def is_member(self, user_id: int) -> bool:
         return self.requester_id == user_id or self.recipient_id == user_id

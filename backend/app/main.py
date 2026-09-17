@@ -74,6 +74,10 @@ if (FRONTEND_DIR / "js").exists():
 if (FRONTEND_DIR / "assets").exists():
     app.mount("/assets", StaticFiles(directory=str(FRONTEND_DIR / "assets")), name="assets")
 
+@app.get("/favicon.ico", include_in_schema=False)
+async def serve_favicon():
+    return FileResponse(FRONTEND_DIR / "assets" / "images" / "favicon.ico")
+
 # Page routes serving frontend HTML files
 @app.get("/", include_in_schema=False)
 async def serve_index():

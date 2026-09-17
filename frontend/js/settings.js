@@ -5,7 +5,7 @@
 let activeConnectionId = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
-  if (!API.isAuthenticated()) {
+  if (!API.isAuthenticated() || !API.isPrivateUnlocked()) {
     window.location.href = '/';
     return;
   }
@@ -22,7 +22,7 @@ async function loadSettings() {
     document.getElementById('settings-status-message').value = me.status_message || '';
     document.getElementById('settings-bio').value = me.bio || '';
     document.getElementById('settings-uid').textContent = me.uid;
-    document.getElementById('settings-email').textContent = me.email;
+    document.getElementById('settings-email').textContent = me.email || me.phone || '—';
 
     // PIN status
     const pinStatus = document.getElementById('pin-status-text');
@@ -30,9 +30,12 @@ async function loadSettings() {
       pinStatus.textContent = me.has_pin ? 'Configured (Active)' : 'Not configured';
     }
 
-    // Partner connection
+    // Partner connection & Danger Zone
     const conn = me.connection;
     const partnerBox = document.getElementById('partner-connection-box');
+    const milestoneBox = document.getElementById('milestone-box');
+    const dangerZone = document.getElementById('relationship-danger-zone');
+
     if (conn && conn.partner) {
       activeConnectionId = conn.id;
       partnerBox.innerHTML = `
@@ -44,9 +47,14 @@ async function loadSettings() {
               <div style="font-size: 0.8rem; color: var(--text-accent);">${conn.partner.uid}</div>
             </div>
           </div>
-          <button class="btn btn-danger btn-sm" onclick="confirmDisconnect(${conn.id})">Disconnect</button>
+          <span class="badge" style="background: rgba(74, 222, 128, 0.15); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3);">
+            Connected
+          </span>
         </div>
       `;
+
+      if (milestoneBox) milestoneBox.style.display = 'block';
+      if (dangerZone) dangerZone.style.display = 'block';
 
       if (conn.relationship_start_date) {
         const d = conn.relationship_start_date.split('T')[0];
@@ -54,7 +62,8 @@ async function loadSettings() {
       }
     } else {
       partnerBox.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">No active partner connection.</p>`;
-      document.getElementById('milestone-box').style.display = 'none';
+      if (milestoneBox) milestoneBox.style.display = 'none';
+      if (dangerZone) dangerZone.style.display = 'none';
     }
   } catch (err) {}
 }
@@ -116,16 +125,58 @@ async function handleMilestoneUpdate(e) {
   } catch (err) {}
 }
 
-async function confirmDisconnect(connId) {
-  if (!confirm('Are you sure you want to disconnect from your partner? Both of you will lose access to this shared space.')) {
+/* Danger Zone: End Relationship Modals & PIN Execution */
+window.openEndRelConfirmationModal = function() {
+  const modal = document.getElementById('end-rel-confirm-modal');
+  if (modal) modal.classList.add('active');
+};
+
+window.closeEndRelConfirmationModal = function() {
+  const modal = document.getElementById('end-rel-confirm-modal');
+  if (modal) modal.classList.remove('active');
+};
+
+window.openEndRelPinModal = function() {
+  closeEndRelConfirmationModal();
+  const modal = document.getElementById('end-rel-pin-modal');
+  const err = document.getElementById('end-rel-pin-error');
+  const inp = document.getElementById('end-rel-pin-input');
+  if (err) { err.style.display = 'none'; err.textContent = ''; }
+  if (inp) inp.value = '';
+  if (modal) modal.classList.add('active');
+};
+
+window.closeEndRelPinModal = function() {
+  const modal = document.getElementById('end-rel-pin-modal');
+  if (modal) modal.classList.remove('active');
+};
+
+window.executeEndRelationship = async function(e) {
+  e.preventDefault();
+  const pinInput = document.getElementById('end-rel-pin-input');
+  const pin = pinInput ? pinInput.value.trim() : '';
+  const errEl = document.getElementById('end-rel-pin-error');
+
+  if (!pin || pin.length < 4) {
+    if (errEl) {
+      errEl.textContent = 'Please enter your 4-digit PIN.';
+      errEl.style.display = 'block';
+    }
     return;
   }
 
   try {
-    await API.delete(`/api/connections/${connId}`);
-    API.showToast('Space disconnected', 'info');
+    const res = await API.post(`/api/connections/${activeConnectionId}/end`, { pin });
+    API.showToast(res.message || 'Relationship has been ended.', 'info');
+    closeEndRelPinModal();
     setTimeout(() => {
       window.location.href = '/private.html';
-    }, 500);
-  } catch (err) {}
-}
+    }, 400);
+  } catch (err) {
+    if (errEl) {
+      errEl.textContent = err.message || 'Incorrect PIN. Action cancelled.';
+      errEl.style.display = 'block';
+    }
+    if (pinInput) pinInput.value = '';
+  }
+};

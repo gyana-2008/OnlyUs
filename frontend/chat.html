@@ -3,7 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Messages — OUR SPACE</title>
+  <title>BETWEEN — Messages</title>
+  
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/favicon-180.png" />
+  <link rel="shortcut icon" href="/assets/images/favicon.ico" />
   
   <link rel="stylesheet" href="/css/base.css" />
   <link rel="stylesheet" href="/css/chat.css" />
@@ -15,7 +20,10 @@
   <header style="background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle); padding: 0.65rem 0;">
     <div class="container flex justify-between items-center">
       <div class="flex items-center gap-4">
-        <a href="/private.html" style="font-family: var(--font-serif); font-size: 1.15rem; font-weight: 600;">BETWEEN</a>
+        <a href="/private.html" class="flex items-center gap-2" style="font-family: var(--font-serif); font-size: 1.15rem; font-weight: 600;">
+          <img src="/assets/images/between-emblem.png" alt="BETWEEN" style="height: 28px; width: 28px; border-radius: 7px; border: 1px solid rgba(197, 160, 89, 0.35); object-fit: cover;" />
+          <span>BETWEEN</span>
+        </a>
         <div class="flex items-center gap-2">
           <a href="/private.html" class="btn btn-outline btn-sm">← Space</a>
           <a href="/memories.html" class="btn btn-outline btn-sm">Memories</a>
@@ -23,10 +31,15 @@
         </div>
       </div>
       
-      <button class="panic-btn" onclick="API.panicDisguise()" title="Panic disguise (Esc)">
-        <span>📰</span>
-        <span>Read News (Esc)</span>
-      </button>
+      <div class="flex items-center gap-2">
+        <button class="btn btn-outline btn-sm" onclick="API.logout()" style="color: #fb7185; border-color: rgba(251, 113, 133, 0.4);" title="Sign Out">
+          Sign Out
+        </button>
+        <button class="panic-btn" onclick="API.panicDisguise()" title="Panic disguise (Esc)">
+          <span>📰</span>
+          <span>Read News (Esc)</span>
+        </button>
+      </div>
     </div>
   </header>
 

@@ -6,12 +6,16 @@ from backend.app.database import get_db
 from backend.app.models.user import User
 from backend.app.models.connection import CoupleConnection
 from backend.app.models.notification import Notification
+from backend.app.services.auth_service import verify_secret
 from backend.app.utils.security import get_current_user
 
 router = APIRouter(prefix="/api/connections", tags=["connections"])
 
 class ConnectionRequestPayload(BaseModel):
     target_uid: str = Field(..., description="Recipient's unique UID (e.g. BT-XXXXXX)")
+
+class EndRelationshipPayload(BaseModel):
+    pin: str = Field(..., description="User's Private PIN for confirmation")
 
 class MilestoneUpdatePayload(BaseModel):
     relationship_start_date: str = Field(..., description="ISO Date string, e.g. 2024-02-14")
@@ -31,10 +35,17 @@ def send_connection_request(
     if not target_user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Target user not found with this UID")
 
-    # Check if current user already has an active accepted connection
+    # Strict Demo Isolation: demo accounts cannot connect with real accounts
+    if current_user.is_demo != target_user.is_demo:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Demo accounts and Real accounts cannot connect to each other."
+        )
+
+    # Check if current user already has an active connection
     my_active = db.query(CoupleConnection).filter(
         ((CoupleConnection.requester_id == current_user.id) | (CoupleConnection.recipient_id == current_user.id)),
-        CoupleConnection.status == "accepted"
+        CoupleConnection.status.in_(["active", "accepted"])
     ).first()
     if my_active:
         raise HTTPException(
@@ -42,10 +53,10 @@ def send_connection_request(
             detail="You already have an active couple space. Disconnect before connecting to a new partner."
         )
 
-    # Check if target user already has an active accepted connection
+    # Check if target user already has an active connection
     target_active = db.query(CoupleConnection).filter(
         ((CoupleConnection.requester_id == target_user.id) | (CoupleConnection.recipient_id == target_user.id)),
-        CoupleConnection.status == "accepted"
+        CoupleConnection.status.in_(["active", "accepted"])
     ).first()
     if target_active:
         raise HTTPException(
@@ -64,12 +75,12 @@ def send_connection_request(
         if existing_req.requester_id == current_user.id:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Connection request already sent and pending")
         else:
-            # The other person already sent a request to this user! Auto-accept or prompt to accept
-            existing_req.status = "accepted"
+            # The other person already sent a request to this user! Auto-connect immediately
+            existing_req.status = "active"
             existing_req.accepted_at = datetime.now(timezone.utc)
             existing_req.relationship_start_date = datetime.now(timezone.utc)
             db.commit()
-            return {"status": "accepted", "message": "Mutual request detected! Connected successfully."}
+            return {"status": "active", "message": "Mutual request detected! Connected successfully."}
 
     # Create new connection
     conn = CoupleConnection(
@@ -102,7 +113,7 @@ def get_connections(
     # Active connection
     active_conn = db.query(CoupleConnection).filter(
         ((CoupleConnection.requester_id == current_user.id) | (CoupleConnection.recipient_id == current_user.id)),
-        CoupleConnection.status == "accepted"
+        CoupleConnection.status.in_(["active", "accepted"])
     ).first()
 
     # Incoming pending requests
@@ -152,7 +163,7 @@ def accept_connection(
     if not conn:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pending request not found")
 
-    conn.status = "accepted"
+    conn.status = "active"
     conn.accepted_at = datetime.now(timezone.utc)
     if not conn.relationship_start_date:
         conn.relationship_start_date = datetime.now(timezone.utc)
@@ -189,37 +200,73 @@ def reject_connection(
     db.commit()
     return {"status": "success", "message": "Connection rejected"}
 
+@router.post("/{connection_id}/end")
+def end_relationship(
+    connection_id: int,
+    data: EndRelationshipPayload,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """End relationship in Danger Zone requiring PIN confirmation."""
+    conn = db.query(CoupleConnection).filter(
+        CoupleConnection.id == connection_id,
+        ((CoupleConnection.requester_id == current_user.id) | (CoupleConnection.recipient_id == current_user.id)),
+        CoupleConnection.status.in_(["active", "accepted"])
+    ).first()
+
+    if not conn:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Active connection not found")
+
+    # Verify user's private PIN
+    if not current_user.hashed_pin or not verify_secret(data.pin.strip(), current_user.hashed_pin):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect PIN. Action cancelled.")
+
+    partner_id = conn.get_partner_id(current_user.id)
+    conn.status = "ended"
+
+    # Notify partner
+    notif = Notification(
+        user_id=partner_id,
+        actor_id=current_user.id,
+        type="connection_ended",
+        title="Relationship Ended",
+        message=f"{current_user.display_name} has ended the couple connection."
+    )
+    db.add(notif)
+    db.commit()
+
+    return {"status": "success", "message": "Relationship has been ended."}
+
 @router.delete("/{connection_id}")
-def disconnect_partner(
+def disconnect_partner_legacy(
     connection_id: int,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Disconnect active partner space."""
+    """Legacy disconnect for backwards compatibility (defaults to ended)."""
     conn = db.query(CoupleConnection).filter(
         CoupleConnection.id == connection_id,
         ((CoupleConnection.requester_id == current_user.id) | (CoupleConnection.recipient_id == current_user.id)),
-        CoupleConnection.status == "accepted"
+        CoupleConnection.status.in_(["active", "accepted"])
     ).first()
 
     if not conn:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Active connection not found")
 
     partner_id = conn.get_partner_id(current_user.id)
-    conn.status = "disconnected"
+    conn.status = "ended"
 
-    # Notify partner
     notif = Notification(
         user_id=partner_id,
         actor_id=current_user.id,
-        type="connection_disconnected",
-        title="Space Disconnected",
-        message=f"{current_user.display_name} has disconnected the private space."
+        type="connection_ended",
+        title="Relationship Ended",
+        message=f"{current_user.display_name} has ended the couple connection."
     )
     db.add(notif)
     db.commit()
 
-    return {"status": "success", "message": "Disconnected successfully"}
+    return {"status": "success", "message": "Relationship ended successfully"}
 
 @router.put("/milestone")
 def update_milestone(
@@ -230,14 +277,13 @@ def update_milestone(
     """Update 'Together Since' relationship start date."""
     conn = db.query(CoupleConnection).filter(
         ((CoupleConnection.requester_id == current_user.id) | (CoupleConnection.recipient_id == current_user.id)),
-        CoupleConnection.status == "accepted"
+        CoupleConnection.status.in_(["active", "accepted"])
     ).first()
 
     if not conn:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No active connection found")
 
     try:
-        # Parse date
         date_obj = datetime.fromisoformat(data.relationship_start_date.replace("Z", "+00:00"))
         conn.relationship_start_date = date_obj
         if data.anniversary_title:

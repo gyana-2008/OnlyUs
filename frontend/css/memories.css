@@ -242,6 +242,143 @@
   color: var(--text-muted);
 }
 
+/* Memory Search Wrap */
+.memory-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 0.35rem 0.85rem;
+  min-width: 220px;
+  transition: all var(--transition-fast);
+}
+
+.memory-search-wrap:focus-within {
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 10px rgba(197, 160, 89, 0.2);
+}
+
+.memory-search-wrap input {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  width: 100%;
+  outline: none;
+  padding: 0;
+}
+
+.memory-search-wrap svg {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* Memory Card Actions */
+.memory-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.memory-action-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: all var(--transition-fast);
+}
+
+.memory-action-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+  border-color: var(--border-subtle);
+}
+
+.memory-action-btn.btn-edit:hover {
+  color: var(--accent-gold);
+  border-color: rgba(197, 160, 89, 0.3);
+}
+
+.memory-action-btn.btn-delete:hover {
+  color: #fb7185;
+  border-color: rgba(251, 113, 133, 0.3);
+}
+
+.memory-media-wrap {
+  cursor: pointer;
+}
+
+/* Lightbox Modal */
+#lightbox-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 10, 14, 0.92);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+#lightbox-modal.active {
+  display: flex;
+  animation: fadeIn 0.2s ease forwards;
+}
+
+.lightbox-content {
+  position: relative;
+  max-width: 900px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#lightbox-img {
+  max-width: 100%;
+  max-height: 72vh;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8);
+  border: 1px solid var(--border-subtle);
+}
+
+.lightbox-caption {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: -2.5rem;
+  right: 0;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: none;
+  font-size: 1.25rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .memories-grid {

@@ -4,6 +4,10 @@
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
+  // STRICT RULE: Never show demo controls on public news/reading pages
+  const isPrivatePage = ['private.html', 'chat.html', 'memories.html', 'settings.html'].some(p => window.location.pathname.includes(p));
+  if (!isPrivatePage) return;
+
   try {
     const status = await fetch('/api/demo/status').then(r => r.json()).catch(() => null);
     if (status && status.demo_mode_enabled) {

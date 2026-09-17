@@ -54,7 +54,7 @@ def test_couple_connection_lifecycle():
     # Beta accepts request
     accept_res = client.post(f"/api/connections/{req_id}/accept", headers={"Authorization": f"Bearer {token_b}"})
     assert accept_res.status_code == 200
-    assert accept_res.json()["connection"]["status"] == "accepted"
+    assert accept_res.json()["connection"]["status"] in ("active", "accepted")
 
     # Both users now see active connection in /me
     me_a = client.get("/api/auth/me", headers={"Authorization": f"Bearer {token_a}"}).json()

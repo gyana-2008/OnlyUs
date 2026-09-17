@@ -11,7 +11,8 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     uid = Column(String(16), unique=True, index=True, nullable=False) # e.g. BT-4A82F9
-    email = Column(String(255), unique=True, index=True, nullable=False)
+    email = Column(String(255), unique=True, index=True, nullable=True)
+    phone = Column(String(32), unique=True, index=True, nullable=True)
     username = Column(String(64), unique=True, index=True, nullable=False)
     hashed_password = Column(String(255), nullable=False)
     hashed_pin = Column(String(255), nullable=True) # 4-6 digit private unlock PIN
@@ -36,6 +37,7 @@ class User(Base):
             "uid": self.uid,
             "username": self.username,
             "email": self.email,
+            "phone": self.phone,
             "display_name": self.display_name,
             "avatar_url": self.avatar_url,
             "bio": self.bio,

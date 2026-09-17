@@ -73,21 +73,112 @@
 }
 
 .brand-logo-area {
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   margin: 0 auto;
+  cursor: pointer;
+  user-select: none;
+  padding: 0.35rem 1rem;
+  border-radius: var(--radius-md);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.25s ease;
+}
+
+.brand-logo-area:hover .brand-emblem-wrap {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5), 0 0 20px rgba(197, 160, 89, 0.45);
+  border-color: rgba(197, 160, 89, 0.65);
+}
+
+.brand-logo-area:hover .brand-title {
+  color: #fffdfa;
+  text-shadow: 0 0 16px rgba(197, 160, 89, 0.4);
+}
+
+.brand-emblem-wrap {
+  width: 50px;
+  height: 50px;
+  border-radius: 13px;
+  overflow: hidden;
+  border: 1px solid rgba(197, 160, 89, 0.4);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45), 0 0 12px rgba(197, 160, 89, 0.22);
+  background: #090c13;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.45rem;
+  transition: all var(--transition-normal);
+}
+
+.brand-emblem-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Defensive fallback in case full logo is rendered */
+.brand-logo-img {
+  max-height: 52px;
+  max-width: 200px;
+  object-fit: contain;
+  margin-bottom: 0.4rem;
 }
 
 .brand-title {
-  font-size: 2.75rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
+  font-family: var(--font-serif);
+  font-size: 2.45rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
   color: var(--text-primary);
   text-transform: uppercase;
   user-select: none;
   cursor: pointer;
   line-height: 1.1;
+  margin: 0;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), text-shadow 0.25s ease, color 0.25s ease;
+  position: relative;
+}
+
+/* Very subtle visual feedback on first click/tap */
+.brand-title.first-tap,
+.brand-logo-area.first-tap .brand-title {
+  text-shadow: 0 0 14px rgba(197, 160, 89, 0.5);
+  color: #fff9ed;
+  transform: scale(1.01);
+}
+
+/* Elegant transition pulse upon completing double-click */
+.brand-title.unlocking,
+.brand-logo-area.unlocking {
+  animation: logoUnlockPulse 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes logoUnlockPulse {
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0px transparent);
+  }
+  45% {
+    transform: scale(1.03);
+    filter: drop-shadow(0 0 18px rgba(197, 160, 89, 0.7));
+  }
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 8px rgba(197, 160, 89, 0.3));
+  }
+}
+
+/* Smooth page dimming when private space modal opens */
+body.page-dimmed main,
+body.page-dimmed .edition-bar,
+body.page-dimmed .breaking-ticker-wrap,
+body.page-dimmed .category-nav,
+body.page-dimmed .search-section,
+body.page-dimmed footer {
+  filter: blur(3px) brightness(0.65);
+  transition: filter 0.35s ease;
 }
 
 .brand-tagline {
@@ -97,6 +188,7 @@
   text-transform: uppercase;
   font-family: var(--font-sans);
   margin-top: 0.35rem;
+  user-select: none;
 }
 
 .masthead-actions {

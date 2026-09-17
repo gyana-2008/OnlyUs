@@ -3,7 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Memories & Analytics — OUR SPACE</title>
+  <title>BETWEEN — Memories</title>
+  
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/favicon-180.png" />
+  <link rel="shortcut icon" href="/assets/images/favicon.ico" />
   
   <link rel="stylesheet" href="/css/base.css" />
   <link rel="stylesheet" href="/css/memories.css" />
@@ -15,7 +20,10 @@
   <header style="background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle); padding: 0.65rem 0;">
     <div class="container flex justify-between items-center">
       <div class="flex items-center gap-4">
-        <a href="/private.html" style="font-family: var(--font-serif); font-size: 1.15rem; font-weight: 600;">BETWEEN</a>
+        <a href="/private.html" class="flex items-center gap-2" style="font-family: var(--font-serif); font-size: 1.15rem; font-weight: 600;">
+          <img src="/assets/images/between-emblem.png" alt="BETWEEN" style="height: 28px; width: 28px; border-radius: 7px; border: 1px solid rgba(197, 160, 89, 0.35); object-fit: cover;" />
+          <span>BETWEEN</span>
+        </a>
         <div class="flex items-center gap-2">
           <a href="/private.html" class="btn btn-outline btn-sm">← Space</a>
           <a href="/chat.html" class="btn btn-outline btn-sm">Messages</a>
@@ -23,10 +31,15 @@
         </div>
       </div>
       
-      <button class="panic-btn" onclick="API.panicDisguise()" title="Panic disguise (Esc)">
-        <span>📰</span>
-        <span>Read News (Esc)</span>
-      </button>
+      <div class="flex items-center gap-2">
+        <button class="btn btn-outline btn-sm" onclick="API.logout()" style="color: #fb7185; border-color: rgba(251, 113, 133, 0.4);" title="Sign Out">
+          Sign Out
+        </button>
+        <button class="panic-btn" onclick="API.panicDisguise()" title="Panic disguise (Esc)">
+          <span>📰</span>
+          <span>Read News (Esc)</span>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -44,16 +57,22 @@
         </button>
       </div>
 
-      <!-- Tag Filter Pills -->
+      <!-- Tag Filter Pills & Search Bar -->
       <div class="memories-filter-bar">
         <ul class="tag-pills-list">
           <li><button class="tag-pill active" data-tag="all">All Memories</button></li>
+          <li><button class="tag-pill" data-tag="fav" id="filter-fav-btn">❤️ Favorites</button></li>
           <li><button class="tag-pill" data-tag="Trip">Trips</button></li>
           <li><button class="tag-pill" data-tag="Firsts">Firsts</button></li>
           <li><button class="tag-pill" data-tag="Date Night">Date Nights</button></li>
           <li><button class="tag-pill" data-tag="Anniversary">Anniversary</button></li>
           <li><button class="tag-pill" data-tag="Everyday">Everyday</button></li>
         </ul>
+
+        <div class="memory-search-wrap">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="memory-search-input" placeholder="Search memories..." />
+        </div>
       </div>
     </section>
 
@@ -133,11 +152,86 @@
 
         <div style="margin-bottom: 1.5rem;">
           <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">Attach Photo (Optional)</label>
-          <input type="file" id="memory-file-input" accept="image/*" style="width: 100%; padding: 0.4rem;" />
+          <input type="file" id="memory-file-input" accept="image/*" style="width: 100%; padding: 0.4rem;" onchange="previewAddMemoryPhoto(event)" />
+          <div id="add-photo-preview-wrap" style="display: none; margin-top: 0.6rem; position: relative;">
+            <img id="add-photo-preview" src="" style="max-height: 140px; width: 100%; object-fit: cover; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);" />
+            <button type="button" onclick="clearAddPhotoPreview()" style="position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.7); color: #fff; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer;" title="Remove photo">✕</button>
+          </div>
         </div>
 
         <button type="submit" class="btn btn-primary" style="width: 100%;">Save Memory 💕</button>
       </form>
+    </div>
+  </div>
+
+  <!-- Edit Memory Modal -->
+  <div class="modal-overlay" id="edit-memory-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="close-edit-memory-btn" onclick="closeEditMemoryModal()">✕</button>
+      <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Edit Shared Memory</h2>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Update the details, story, or photograph of this moment.</p>
+
+      <form id="edit-memory-form" onsubmit="handleUpdateMemory(event)">
+        <input type="hidden" id="edit-memory-id" />
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">Memory Title</label>
+          <input type="text" id="edit-memory-title-input" placeholder="e.g. Picnic by the lake" style="width: 100%;" required />
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">Date</label>
+            <input type="date" id="edit-memory-date-input" style="width: 100%;" required />
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">Category</label>
+            <select id="edit-memory-tag-select" style="width: 100%;">
+              <option value="Everyday">Everyday</option>
+              <option value="Trip">Trip</option>
+              <option value="Firsts">Firsts</option>
+              <option value="Date Night">Date Night</option>
+              <option value="Anniversary">Anniversary</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">Story / Notes</label>
+          <textarea id="edit-memory-story-input" rows="3" placeholder="What made this moment unforgettable?" style="width: 100%;"></textarea>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">Photo</label>
+          <div id="edit-photo-preview-wrap" style="margin-bottom: 0.5rem; position: relative; display: none;">
+            <img id="edit-photo-preview" src="" style="max-height: 140px; width: 100%; object-fit: cover; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);" />
+            <button type="button" onclick="removeEditPhoto()" style="position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.7); color: #fff; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer;" title="Remove Photo">✕</button>
+          </div>
+          <input type="file" id="edit-memory-file-input" accept="image/*" style="width: 100%; padding: 0.4rem;" onchange="previewEditMemoryPhoto(event)" />
+          <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">Leave empty to keep existing photo, or upload a new one.</span>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
+          <input type="checkbox" id="edit-memory-fav-check" style="width: auto; cursor: pointer;" />
+          <label for="edit-memory-fav-check" style="font-size: 0.85rem; color: var(--text-secondary); cursor: pointer;">Mark as favorite ❤️</label>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem;">
+          <button type="submit" class="btn btn-primary" style="flex: 1; justify-content: center;">Save Changes 💕</button>
+          <button type="button" class="btn btn-outline" onclick="closeEditMemoryModal()" style="color: var(--text-muted); justify-content: center;">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Lightbox Modal -->
+  <div class="modal-overlay" id="lightbox-modal" onclick="closeLightbox(event)">
+    <div class="lightbox-content" onclick="event.stopPropagation()">
+      <button class="modal-close lightbox-close" onclick="closeLightbox()">✕</button>
+      <img id="lightbox-img" src="" alt="Memory" />
+      <div class="lightbox-caption">
+        <h3 id="lightbox-title" style="margin: 0; font-size: 1.1rem; color: #fff;"></h3>
+        <span id="lightbox-meta" style="font-size: 0.8rem; color: var(--text-muted);"></span>
+      </div>
     </div>
   </div>
 

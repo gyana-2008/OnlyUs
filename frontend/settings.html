@@ -3,7 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Settings & Privacy — OUR SPACE</title>
+  <title>BETWEEN — Settings</title>
+  
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/favicon-180.png" />
+  <link rel="shortcut icon" href="/assets/images/favicon.ico" />
   
   <link rel="stylesheet" href="/css/base.css" />
   <link rel="stylesheet" href="/css/components.css" />
@@ -14,7 +19,10 @@
   <header style="background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle); padding: 0.65rem 0;">
     <div class="container flex justify-between items-center">
       <div class="flex items-center gap-4">
-        <a href="/private.html" style="font-family: var(--font-serif); font-size: 1.15rem; font-weight: 600;">BETWEEN</a>
+        <a href="/private.html" class="flex items-center gap-2" style="font-family: var(--font-serif); font-size: 1.15rem; font-weight: 600;">
+          <img src="/assets/images/between-emblem.png" alt="BETWEEN" style="height: 28px; width: 28px; border-radius: 7px; border: 1px solid rgba(197, 160, 89, 0.35); object-fit: cover;" />
+          <span>BETWEEN</span>
+        </a>
         <div class="flex items-center gap-2">
           <a href="/private.html" class="btn btn-outline btn-sm">← Space</a>
           <a href="/chat.html" class="btn btn-outline btn-sm">Messages</a>
@@ -22,10 +30,15 @@
         </div>
       </div>
       
-      <button class="panic-btn" onclick="API.panicDisguise()" title="Panic disguise (Esc)">
-        <span>📰</span>
-        <span>Read News (Esc)</span>
-      </button>
+      <div class="flex items-center gap-2">
+        <button class="btn btn-outline btn-sm" onclick="API.logout()" style="color: #fb7185; border-color: rgba(251, 113, 133, 0.4);" title="Sign Out">
+          Sign Out
+        </button>
+        <button class="panic-btn" onclick="API.panicDisguise()" title="Panic disguise (Esc)">
+          <span>📰</span>
+          <span>Read News (Esc)</span>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -102,9 +115,9 @@
       </div>
     </div>
 
-    <!-- Section 4: Couple Connection & Milestone -->
+    <!-- Section 4: Relationship -->
     <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.75rem; margin-bottom: 2rem;">
-      <h2 style="font-size: 1.25rem; margin-bottom: 1.25rem;">Couple Connection</h2>
+      <h2 style="font-size: 1.25rem; margin-bottom: 1.25rem;">Relationship</h2>
       
       <div id="partner-connection-box" style="margin-bottom: 1.5rem;">
         <!-- Filled by JS -->
@@ -121,12 +134,77 @@
       </div>
     </div>
 
+    <!-- Section 5: Relationship -> Danger Zone -->
+    <div id="relationship-danger-zone" style="background: rgba(225, 29, 72, 0.04); border: 1px solid rgba(225, 29, 72, 0.35); border-radius: var(--radius-lg); padding: 1.75rem; margin-bottom: 2rem;">
+      <div style="font-size: 0.8rem; font-weight: 700; color: #fb7185; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.5rem;">
+        DANGER ZONE
+      </div>
+      <h2 style="font-size: 1.3rem; margin-bottom: 0.75rem; color: var(--text-primary);">End Relationship</h2>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5; margin-bottom: 1.5rem; max-width: 580px;">
+        This will disconnect you and your partner from the current couple relationship.<br />
+        Your existing messages/memories may be affected according to the application's data-retention rules.
+      </p>
+      <button type="button" class="btn btn-outline" id="btn-open-end-rel" onclick="openEndRelConfirmationModal()" style="color: #fb7185; border-color: #fb7185; font-weight: 600;">
+        END RELATIONSHIP
+      </button>
+    </div>
+
     <!-- Sign Out -->
-    <div style="text-align: right;">
+    <div style="text-align: right; margin-bottom: 2rem;">
       <button class="btn btn-outline" onclick="API.logout()" style="color: #fb7185; border-color: rgba(225, 29, 72, 0.3);">
         Sign Out of BETWEEN
       </button>
     </div>
+
+  </main>
+
+  <!-- Confirmation Modal: End Relationship -->
+  <div class="modal-overlay" id="end-rel-confirm-modal">
+    <div class="modal-content" style="max-width: 440px; text-align: center; border: 1px solid rgba(225, 29, 72, 0.4);">
+      <h2 style="font-size: 1.35rem; color: #fb7185; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 0.75rem;">
+        END RELATIONSHIP?
+      </h2>
+      <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.5rem;">
+        Are you sure you want to end this couple connection?<br />
+        This action will disconnect both accounts.
+      </p>
+      <div style="display: flex; gap: 0.75rem;">
+        <button type="button" class="btn btn-outline" onclick="closeEndRelConfirmationModal()" style="flex: 1; justify-content: center; color: var(--text-muted);">
+          CANCEL
+        </button>
+        <button type="button" class="btn btn-primary" id="btn-proceed-to-pin" onclick="openEndRelPinModal()" style="flex: 1; justify-content: center; background: #e11d48; border-color: #e11d48; color: #fff;">
+          YES, END RELATIONSHIP
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PIN Verification Modal for End Relationship -->
+  <div class="modal-overlay" id="end-rel-pin-modal">
+    <div class="modal-content" style="max-width: 420px; text-align: center; border: 1px solid rgba(225, 29, 72, 0.4);">
+      <h2 style="font-size: 1.3rem; color: var(--text-primary); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 0.5rem;">
+        CONFIRM WITH PIN
+      </h2>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.25rem;">
+        Please enter your private PIN to authorize ending this relationship.
+      </p>
+      <div id="end-rel-pin-error" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; padding: 0.6rem; border-radius: var(--radius-sm); font-size: 0.85rem; margin-bottom: 1rem;"></div>
+
+      <form onsubmit="executeEndRelationship(event)">
+        <div style="margin-bottom: 1.5rem;">
+          <input type="password" id="end-rel-pin-input" maxlength="8" placeholder="••••" style="width: 160px; text-align: center; font-size: 1.5rem; letter-spacing: 0.25em; padding: 0.6rem;" required autofocus />
+        </div>
+        <div style="display: flex; gap: 0.75rem;">
+          <button type="button" class="btn btn-outline" onclick="closeEndRelPinModal()" style="flex: 1; justify-content: center; color: var(--text-muted);">
+            CANCEL
+          </button>
+          <button type="submit" class="btn btn-primary" id="btn-confirm-end-rel-pin" style="flex: 1; justify-content: center; background: #e11d48; border-color: #e11d48; color: #fff;">
+            CONFIRM END
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   </main>
 
