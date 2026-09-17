@@ -216,3 +216,13 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# BETWEEN Project Specific
+.env
+.env.local
+*.db
+*.sqlite
+*.sqlite3
+uploads/*
+!uploads/.gitkeep
+.pytest_cache/

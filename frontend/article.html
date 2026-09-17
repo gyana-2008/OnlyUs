@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Article — BETWEEN</title>
+  
+  <link rel="stylesheet" href="/css/base.css" />
+  <link rel="stylesheet" href="/css/news.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+</head>
+<body>
+
+  <!-- Top Edition Bar -->
+  <aside class="edition-bar">
+    <div class="container">
+      <div class="edition-meta">
+        <a href="/" style="font-weight: 600; color: var(--text-primary);">← Back to Front Page</a>
+      </div>
+      <div class="edition-select-wrap">
+        <span class="edition-indicator">EDITION: GLOBAL</span>
+        <span class="secret-glyph-trigger" onclick="openSecretModal()" title="Edition switch">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></svg>
+        </span>
+      </div>
+    </div>
+  </aside>
+
+  <article class="reader-article-container" style="padding-top: 2rem;">
+    <span class="badge" id="art-cat" style="margin-bottom: 1rem;">World</span>
+    <h1 class="reader-title" id="art-title">Loading Article...</h1>
+    <p id="art-meta" style="color: var(--text-muted); margin-bottom: 2rem; font-size: 0.95rem;"></p>
+    <img class="reader-hero-img" id="art-img" src="" alt="Cover" />
+    <div class="reader-body" id="art-content"></div>
+  </article>
+
+  <!-- Secret Access Modal -->
+  <div class="modal-overlay" id="secret-access-modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeSecretModal()">✕</button>
+      <div id="secret-auth-view">
+        <h2 class="secret-modal-title">Subscriber Access</h2>
+        <p class="secret-modal-subtitle">Sign in to unlock personalized editions.</p>
+        <form onsubmit="handleSecretLogin(event)">
+          <div style="margin-bottom: 1rem;">
+            <input type="text" id="secret-login-ident" style="width: 100%;" placeholder="UID, Email, or Username" required />
+          </div>
+          <div style="margin-bottom: 1.5rem;">
+            <input type="password" id="secret-login-pwd" style="width: 100%;" placeholder="Password" required />
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Sign In</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/demo.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const artId = urlParams.get('id') || 'art-world-01';
+
+      try {
+        const art = await API.get(`/api/news/${artId}`);
+        document.title = `${art.title} — BETWEEN`;
+        document.getElementById('art-cat').textContent = art.category;
+        document.getElementById('art-title').textContent = art.title;
+        document.getElementById('art-meta').textContent = `By ${art.author} · ${art.source} · ${art.read_time}`;
+        document.getElementById('art-img').src = art.image_url;
+        
+        const paragraphs = art.content.split('\n\n').filter(p => p.trim());
+        document.getElementById('art-content').innerHTML = paragraphs.map(p => `<p>${p}</p>`).join('');
+      } catch (err) {
+        document.getElementById('art-title').textContent = "Article Not Found";
+      }
+    });
+  </script>
+</body>
+</html>

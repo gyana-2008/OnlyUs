@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings & Privacy — OUR SPACE</title>
+  
+  <link rel="stylesheet" href="/css/base.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+</head>
+<body style="min-height: 100vh; background: var(--bg-primary);">
+
+  <!-- Top Space Bar -->
+  <header style="background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle); padding: 0.65rem 0;">
+    <div class="container flex justify-between items-center">
+      <div class="flex items-center gap-4">
+        <a href="/private.html" style="font-family: var(--font-serif); font-size: 1.15rem; font-weight: 600;">BETWEEN</a>
+        <div class="flex items-center gap-2">
+          <a href="/private.html" class="btn btn-outline btn-sm">← Space</a>
+          <a href="/chat.html" class="btn btn-outline btn-sm">Messages</a>
+          <a href="/memories.html" class="btn btn-outline btn-sm">Memories</a>
+        </div>
+      </div>
+      
+      <button class="panic-btn" onclick="API.panicDisguise()" title="Panic disguise (Esc)">
+        <span>📰</span>
+        <span>Read News (Esc)</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="container" style="max-width: 780px; padding: 2.5rem 1.5rem 5rem;">
+    <h1 style="font-size: 2.2rem; margin-bottom: 0.5rem;">Settings & Privacy</h1>
+    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem;">Manage your account, couple connection, security layer, and privacy tiers.</p>
+
+    <!-- Section 1: Profile -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.75rem; margin-bottom: 2rem;">
+      <h2 style="font-size: 1.25rem; margin-bottom: 1.25rem;">Account & Profile</h2>
+      <form onsubmit="handleProfileUpdate(event)">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">Display Name</label>
+            <input type="text" id="settings-display-name" style="width: 100%;" required />
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">Status Message</label>
+            <input type="text" id="settings-status-message" placeholder="e.g. Thinking of you 💕" style="width: 100%;" />
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">Bio</label>
+          <textarea id="settings-bio" rows="2" style="width: 100%;"></textarea>
+        </div>
+
+        <div style="display: flex; gap: 2rem; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; background: var(--bg-secondary); padding: 0.75rem 1rem; border-radius: var(--radius-sm);">
+          <div>Your UID: <strong id="settings-uid" style="color: var(--accent-gold); font-family: var(--font-mono);"></strong></div>
+          <div>Email: <strong id="settings-email" style="color: var(--text-primary);"></strong></div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save Profile</button>
+      </form>
+    </div>
+
+    <!-- Section 2: Security & Private PIN -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.75rem; margin-bottom: 2rem;">
+      <h2 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Private Access PIN</h2>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+        Status: <span id="pin-status-text" style="color: var(--accent-gold); font-weight: 600;">Checking...</span>. This 4-digit code is required when opening your private space from the news portal.
+      </p>
+
+      <form onsubmit="handlePinSetup(event)" style="max-width: 400px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">New 4-Digit PIN</label>
+            <input type="password" id="new-pin-input" maxlength="8" placeholder="••••" style="width: 100%;" required />
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">Confirm PIN</label>
+            <input type="password" id="confirm-pin-input" maxlength="8" placeholder="••••" style="width: 100%;" required />
+          </div>
+        </div>
+        <button type="submit" class="btn btn-secondary">Update PIN</button>
+      </form>
+    </div>
+
+    <!-- Section 3: Location Privacy Tiers -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.75rem; margin-bottom: 2rem;">
+      <h2 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Location Sharing Privacy</h2>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+        Choose what level of location information is shared with your partner. Off by default.
+      </p>
+
+      <div style="max-width: 400px; margin-bottom: 1rem;">
+        <select id="location-sharing-select" onchange="handleLocationPermissionChange()" style="width: 100%;">
+          <option value="off">Location Sharing: OFF</option>
+          <option value="distance_only">Distance Only (e.g. "1,247 km apart")</option>
+          <option value="city_only">City/Region & Distance</option>
+          <option value="approximate">Approximate Location</option>
+          <option value="exact">Exact GPS Coordinates</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Section 4: Couple Connection & Milestone -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.75rem; margin-bottom: 2rem;">
+      <h2 style="font-size: 1.25rem; margin-bottom: 1.25rem;">Couple Connection</h2>
+      
+      <div id="partner-connection-box" style="margin-bottom: 1.5rem;">
+        <!-- Filled by JS -->
+      </div>
+
+      <div id="milestone-box" style="border-top: 1px solid var(--border-subtle); padding-top: 1.25rem;">
+        <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">Relationship Start Date ("Together Since")</h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">This anchors your live relationship counter.</p>
+        
+        <form onsubmit="handleMilestoneUpdate(event)" style="display: flex; gap: 0.75rem; max-width: 400px;">
+          <input type="date" id="milestone-date-input" style="flex-grow: 1;" required />
+          <button type="submit" class="btn btn-secondary">Update Date</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Sign Out -->
+    <div style="text-align: right;">
+      <button class="btn btn-outline" onclick="API.logout()" style="color: #fb7185; border-color: rgba(225, 29, 72, 0.3);">
+        Sign Out of BETWEEN
+      </button>
+    </div>
+
+  </main>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/settings.js"></script>
+  <script src="/js/demo.js"></script>
+</body>
+</html>

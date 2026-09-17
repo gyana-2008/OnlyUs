@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register — BETWEEN</title>
+  <link rel="stylesheet" href="/css/base.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+</head>
+<body style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: var(--bg-primary); padding: 2rem 1rem;">
+
+  <div style="width: 100%; max-width: 480px; padding: 2.5rem; background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);">
+    
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <h1 style="font-family: var(--font-serif); font-size: 2.2rem; letter-spacing: 0.05em;">BETWEEN</h1>
+      <p style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 0.25rem;">Create Your Private Space Account</p>
+    </div>
+
+    <!-- Registration Form -->
+    <form id="register-form" onsubmit="handleRegister(event)">
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">Display Name (What your partner sees)</label>
+        <input type="text" id="reg-display-name" style="width: 100%;" placeholder="e.g. Alex" required />
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <div>
+          <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">Username</label>
+          <input type="text" id="reg-username" style="width: 100%;" placeholder="alex_v" required />
+        </div>
+        <div>
+          <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">Email</label>
+          <input type="email" id="reg-email" style="width: 100%;" placeholder="alex@example.com" required />
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+        <div>
+          <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">Password</label>
+          <input type="password" id="reg-pwd" style="width: 100%;" placeholder="••••••••" required />
+        </div>
+        <div>
+          <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">Confirm</label>
+          <input type="password" id="reg-confirm-pwd" style="width: 100%;" placeholder="••••••••" required />
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.8rem; font-size: 0.95rem; margin-bottom: 1.25rem;">Create Account</button>
+
+      <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted);">
+        <a href="/" style="color: var(--text-secondary);">← Read News</a>
+        <a href="/login.html" style="color: var(--text-accent);">Already have an account?</a>
+      </div>
+    </form>
+
+    <!-- Success Modal showing unique UID -->
+    <div id="uid-success-panel" style="display: none; text-align: center; padding: 1.5rem 0;">
+      <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">✨</div>
+      <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Account Ready</h2>
+      <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem;">Your unique connection UID has been generated:</p>
+      
+      <div style="background: var(--bg-card); border: 2px dashed var(--accent-gold); padding: 1.25rem; border-radius: var(--radius-md); margin-bottom: 1.5rem;">
+        <span id="created-uid-display" style="font-family: var(--font-mono); font-size: 1.8rem; font-weight: 700; color: var(--accent-gold); letter-spacing: 0.1em;"></span>
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Share this UID with your partner so they can connect with you.</p>
+      </div>
+
+      <button class="btn btn-primary" onclick="window.location.href='/private.html'" style="width: 100%;">Proceed to Private Space</button>
+    </div>
+
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/demo.js"></script>
+  <script>
+    async function handleRegister(e) {
+      e.preventDefault();
+      const display_name = document.getElementById('reg-display-name').value.trim();
+      const username = document.getElementById('reg-username').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const password = document.getElementById('reg-pwd').value;
+      const confirm = document.getElementById('reg-confirm-pwd').value;
+
+      if (password !== confirm) {
+        API.showToast('Passwords do not match', 'error');
+        return;
+      }
+
+      try {
+        const res = await API.post('/api/auth/register', {
+          display_name,
+          username,
+          email,
+          password
+        });
+
+        API.setToken(res.access_token);
+        API.setUser(res.user);
+
+        // Show generated UID
+        document.getElementById('register-form').style.display = 'none';
+        document.getElementById('created-uid-display').textContent = res.user.uid;
+        document.getElementById('uid-success-panel').style.display = 'block';
+
+      } catch (err) {}
+    }
+  </script>
+</body>
+</html>

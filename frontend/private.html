@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OUR SPACE — BETWEEN</title>
+  
+  <link rel="stylesheet" href="/css/base.css" />
+  <link rel="stylesheet" href="/css/private.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+</head>
+<body>
+
+  <!-- Top Private Space Header -->
+  <header class="private-header">
+    <div class="container">
+      <div class="private-nav">
+        <div class="private-brand">
+          <span style="font-family: var(--font-serif); font-size: 1.25rem; letter-spacing: 0.05em; font-weight: 600;">BETWEEN</span>
+          <span class="private-brand-badge">OUR SPACE</span>
+        </div>
+
+        <ul class="private-nav-links">
+          <li><a href="/private.html" class="private-nav-link active">Space</a></li>
+          <li><a href="/chat.html" class="private-nav-link">Messages</a></li>
+          <li><a href="/memories.html" class="private-nav-link">Memories</a></li>
+          <li><a href="/settings.html" class="private-nav-link">Settings</a></li>
+        </ul>
+
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <!-- Disguise / Panic Button -->
+          <button class="panic-btn" onclick="API.panicDisguise()" title="Immediately hide private space (or press Esc)">
+            <span>📰</span>
+            <span>Read News (Esc)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container dashboard-main">
+
+    <!-- STATE 1: Connect with Partner (Shown if not yet connected) -->
+    <div id="couple-connect-view" style="display: none; max-width: 600px; margin: 2rem auto; text-align: center;">
+      <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 3rem 2rem;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">💌</div>
+        <h2 style="font-size: 1.8rem; margin-bottom: 0.75rem;">Connect With Your Partner</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.95rem;">
+          Your unique UID is <strong id="my-uid-badge" style="color: var(--accent-gold); font-family: var(--font-mono);">BT-000000</strong>.
+          Share this with your partner or enter their UID below to initiate your shared private space.
+        </p>
+
+        <form onsubmit="sendConnectionRequest(event)" style="display: flex; gap: 0.75rem; margin-bottom: 2rem;">
+          <input type="text" id="target-partner-uid" placeholder="Enter Partner's UID (e.g. BT-XXXXXX)" style="flex-grow: 1;" required />
+          <button type="submit" class="btn btn-primary">Send Request</button>
+        </form>
+
+        <div style="text-align: left; border-top: 1px solid var(--border-subtle); padding-top: 1.5rem;">
+          <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Incoming Requests</h3>
+          <div id="incoming-requests-list">
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Checking for requests...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATE 2: Full Couple Dashboard (Shown when active connection exists) -->
+    <div id="couple-connected-view" style="display: none;">
+      
+      <!-- Couple Hero Card -->
+      <section class="couple-hero-card">
+        <div class="couple-avatars-wrap">
+          <!-- Current User Avatar -->
+          <div class="avatar-card">
+            <div class="avatar-img-wrap">
+              <img class="avatar-img" id="my-avatar-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" alt="Me" />
+              <span class="avatar-status-pill" id="my-status-text">Active</span>
+            </div>
+            <strong id="my-display-name">You</strong>
+          </div>
+
+          <!-- Pulsing Heart Connector -->
+          <div class="couple-heart-connector">💕</div>
+
+          <!-- Partner Avatar -->
+          <div class="avatar-card">
+            <div class="avatar-img-wrap">
+              <img class="avatar-img" id="partner-avatar-img" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80" alt="Partner" />
+              <span class="avatar-status-pill" id="partner-status-text">Online</span>
+            </div>
+            <strong id="partner-display-name">Partner</strong>
+            <span id="partner-uid-badge" style="font-size: 0.75rem; color: var(--text-accent); font-family: var(--font-mono);"></span>
+          </div>
+        </div>
+
+        <!-- Live Relationship Timer -->
+        <div class="timer-container">
+          <div class="timer-tagline">
+            <span>✨</span>
+            <span>Together Since</span>
+            <button onclick="window.location.href='/settings.html'" style="color: var(--text-muted); font-size: 0.75rem; text-decoration: underline; margin-left: 0.4rem;">Edit</button>
+          </div>
+
+          <div class="timer-digits-grid">
+            <div class="timer-digit-card">
+              <span class="timer-val" id="timer-years">0</span>
+              <span class="timer-unit">Years</span>
+            </div>
+            <div class="timer-digit-card">
+              <span class="timer-val" id="timer-months">0</span>
+              <span class="timer-unit">Months</span>
+            </div>
+            <div class="timer-digit-card">
+              <span class="timer-val" id="timer-days">0</span>
+              <span class="timer-unit">Days</span>
+            </div>
+            <div class="timer-digit-card">
+              <span class="timer-val" id="timer-hours">00</span>
+              <span class="timer-unit">Hours</span>
+            </div>
+            <div class="timer-digit-card">
+              <span class="timer-val" id="timer-minutes">00</span>
+              <span class="timer-unit">Minutes</span>
+            </div>
+            <div class="timer-digit-card">
+              <span class="timer-val" id="timer-seconds" style="color: var(--accent-gold);">00</span>
+              <span class="timer-unit">Seconds</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3-Column Grid -->
+      <div class="dashboard-grid">
+        
+        <!-- Card 1: Privacy-First Distance -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h3 class="dash-card-title">
+              <span>📍</span> Distance Between Us
+            </h3>
+            <button class="btn btn-outline btn-sm" onclick="requestShareLocation()" title="Sync Current Location">Sync</button>
+          </div>
+          
+          <div class="distance-display" id="distance-display-wrap">
+            <span class="distance-number" id="distance-val">—</span>
+            <span style="font-size: 0.85rem; color: var(--text-muted);" id="distance-miles-val"></span>
+            <div class="distance-line-graphic"></div>
+            <div class="distance-cities" id="distance-cities">Calculating distance...</div>
+          </div>
+          <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: auto;">
+            Privacy-first: Only distance is calculated. Raw GPS coordinates are never exposed.
+          </p>
+        </div>
+
+        <!-- Card 2: Quick Reaction & Daily Question -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h3 class="dash-card-title">
+              <span>💭</span> Thinking of You
+            </h3>
+          </div>
+
+          <button class="thinking-btn" id="thinking-ping-btn" onclick="sendThinkingOfYou()">
+            <span>💓</span> Send Warm Pulse
+          </button>
+
+          <div style="margin-top: 1.25rem;">
+            <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.4rem;">Today's Reflection</div>
+            <div class="prompt-box" id="daily-question-text">
+              "What is one memory of us that made you smile today?"
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: Quick Navigation to Chat & Memories -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h3 class="dash-card-title">
+              <span>💬</span> Private Messages
+            </h3>
+            <a href="/chat.html" class="btn btn-outline btn-sm">Open Chat →</a>
+          </div>
+
+          <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+            End-to-end private conversation. Supports photos, videos, and built-in voice notes.
+          </p>
+
+          <div style="margin-top: auto; display: flex; flex-direction: column; gap: 0.75rem;">
+            <a href="/chat.html" class="btn btn-primary" style="width: 100%;">Go to Private Chat</a>
+            <a href="/memories.html" class="btn btn-secondary" style="width: 100%;">Shared Memories & Timeline</a>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/dashboard.js"></script>
+  <script src="/js/demo.js"></script>
+</body>
+</html>

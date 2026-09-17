@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BETWEEN — Stay informed. Stay connected.</title>
+  <meta name="description" content="A modern, independent news publication delivering rigorous journalism across world affairs, science, technology, and culture." />
+  
+  <link rel="stylesheet" href="/css/base.css" />
+  <link rel="stylesheet" href="/css/news.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+</head>
+<body>
+
+  <!-- Top Edition Bar -->
+  <aside class="edition-bar" aria-label="Edition and date information">
+    <div class="container">
+      <div class="edition-meta">
+        <span id="current-date">Thursday, May 20, 2025</span>
+        <span>·</span>
+        <span>Global Wire Feed</span>
+      </div>
+      <div class="edition-select-wrap">
+        <span class="edition-indicator">EDITION: GLOBAL</span>
+        <!-- Subtle discreet glyph trigger for Private Access -->
+        <span class="secret-glyph-trigger" id="secret-glyph" title="Edition switch" role="button" tabindex="0" aria-label="Private Access">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></svg>
+        </span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Masthead -->
+  <header class="masthead">
+    <div class="container">
+      <div class="masthead-inner">
+        <div style="width: 140px; text-align: left;">
+          <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">EST. 2025</span>
+        </div>
+        
+        <div class="brand-logo-area">
+          <h1 class="brand-title" id="brand-title-trigger" title="BETWEEN">BETWEEN</h1>
+          <p class="brand-tagline">Stay informed. Stay connected.</p>
+        </div>
+
+        <div class="masthead-actions" style="width: 140px; justify-content: flex-end;">
+          <button class="masthead-btn" id="open-saved-btn" title="Saved Bookmarks">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            <span>Saved</span>
+          </button>
+          <button class="masthead-btn" id="open-history-btn" title="Reading History">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Breaking News Ticker -->
+  <div class="breaking-ticker-wrap">
+    <div class="container">
+      <div class="breaking-ticker">
+        <span class="ticker-badge">Breaking</span>
+        <div class="ticker-content">
+          <span class="ticker-headline-link" id="ticker-headline">Global Climate Accord Reaches Historic Milestone at Geneva Summit...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Category Bar -->
+  <nav class="category-nav" aria-label="News categories">
+    <div class="container">
+      <ul class="category-list">
+        <li><button class="category-tab active" data-cat="all">All Stories</button></li>
+        <li><button class="category-tab" data-cat="world">World</button></li>
+        <li><button class="category-tab" data-cat="india">India</button></li>
+        <li><button class="category-tab" data-cat="technology">Technology</button></li>
+        <li><button class="category-tab" data-cat="science">Science</button></li>
+        <li><button class="category-tab" data-cat="business">Business</button></li>
+        <li><button class="category-tab" data-cat="sports">Sports</button></li>
+        <li><button class="category-tab" data-cat="lifestyle">Lifestyle</button></li>
+        <li><button class="category-tab" data-cat="trending">Trending</button></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Live Search Bar -->
+  <section class="search-section">
+    <div class="container">
+      <div class="search-input-wrap">
+        <svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="news-search-input" placeholder="Search news, topics, and analysis..." />
+      </div>
+    </div>
+  </section>
+
+  <!-- Hero Feature Stories -->
+  <main class="container">
+    <section class="hero-section">
+      <div class="hero-grid">
+        <!-- Primary Feature -->
+        <article class="hero-primary" id="hero-primary-story"></article>
+
+        <!-- Secondary Stories Sidebar -->
+        <div class="hero-secondary-list" id="hero-secondary-list"></div>
+      </div>
+    </section>
+
+    <!-- Articles Feed Grid -->
+    <section class="articles-section">
+      <div class="section-header">
+        <h2 class="section-title">Latest Reporting</h2>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Updated continuously</span>
+      </div>
+      <div class="articles-grid" id="articles-grid"></div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer style="background: var(--bg-secondary); border-top: 1px solid var(--border-subtle); padding: 3rem 0; margin-top: auto; font-size: 0.85rem; color: var(--text-muted);">
+    <div class="container flex justify-between items-center" style="flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <span style="font-family: var(--font-serif); font-size: 1.1rem; color: var(--text-primary);">BETWEEN</span>
+        <span style="margin-left: 0.5rem;">— Stay informed. Stay connected.</span>
+      </div>
+      <div>
+        <span>© 2025 Between Media Group. All rights reserved.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Saved Articles Drawer -->
+  <div class="drawer-overlay" id="saved-drawer-overlay">
+    <div class="drawer-panel">
+      <div class="drawer-header">
+        <h3>Saved for Later</h3>
+        <button class="drawer-close-btn modal-close">✕</button>
+      </div>
+      <div class="drawer-items-list" id="saved-drawer-items"></div>
+    </div>
+  </div>
+
+  <!-- Reading History Drawer -->
+  <div class="drawer-overlay" id="history-drawer-overlay">
+    <div class="drawer-panel">
+      <div class="drawer-header">
+        <h3>Reading History</h3>
+        <button class="drawer-close-btn modal-close">✕</button>
+      </div>
+      <div class="drawer-items-list" id="history-drawer-items"></div>
+    </div>
+  </div>
+
+  <!-- Distraction-Free Article Reading Modal -->
+  <div class="reader-modal" id="reader-modal">
+    <div class="reader-toolbar">
+      <div class="container flex justify-between items-center">
+        <button class="btn btn-outline btn-sm" onclick="closeArticleReader()">← Return to Edition</button>
+        <span class="badge" id="reader-category">World</span>
+        <span id="reader-read-time" style="font-size: 0.8rem; color: var(--text-muted);">4 min read</span>
+      </div>
+      <div class="reader-progress-bar" id="reader-progress"></div>
+    </div>
+    
+    <div class="reader-article-container">
+      <h1 class="reader-title" id="reader-title"></h1>
+      <p id="reader-author" style="color: var(--text-muted); margin-bottom: 2rem; font-size: 0.95rem;"></p>
+      <img class="reader-hero-img" id="reader-img" src="" alt="Article cover" />
+      <div class="reader-body" id="reader-body-paragraphs"></div>
+    </div>
+  </div>
+
+  <!-- Discreet Secret Access Modal -->
+  <div class="modal-overlay" id="secret-access-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="secret-modal-close">✕</button>
+
+      <!-- View 1: Discreet Login View -->
+      <div id="secret-auth-view">
+        <h2 class="secret-modal-title">Subscriber Access</h2>
+        <p class="secret-modal-subtitle">Sign in to unlock personalized editions and private archives.</p>
+        <form onsubmit="handleSecretLogin(event)">
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">UID, Email, or Username</label>
+            <input type="text" id="secret-login-ident" style="width: 100%;" placeholder="e.g. BT-XXXXXX or email" required />
+          </div>
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">Password</label>
+            <input type="password" id="secret-login-pwd" style="width: 100%;" placeholder="••••••••" required />
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">Verify & Enter</button>
+          <div style="text-align: center; font-size: 0.85rem; color: var(--text-muted);">
+            Need a secure account? <a href="/register.html" style="color: var(--text-accent);">Register here</a>
+          </div>
+        </form>
+      </div>
+
+      <!-- View 2: PIN Unlock Keypad -->
+      <div id="secret-pin-view" style="display: none;">
+        <h2 class="secret-modal-title">Private Verification</h2>
+        <p class="secret-modal-subtitle">Enter your 4-digit PIN to open your private space.</p>
+        
+        <div class="pin-pad-container">
+          <div class="pin-dots-display">
+            <div class="pin-dot"></div>
+            <div class="pin-dot"></div>
+            <div class="pin-dot"></div>
+            <div class="pin-dot"></div>
+          </div>
+
+          <div class="pin-keypad-grid">
+            <button class="pin-key-btn" data-val="1">1</button>
+            <button class="pin-key-btn" data-val="2">2</button>
+            <button class="pin-key-btn" data-val="3">3</button>
+            <button class="pin-key-btn" data-val="4">4</button>
+            <button class="pin-key-btn" data-val="5">5</button>
+            <button class="pin-key-btn" data-val="6">6</button>
+            <button class="pin-key-btn" data-val="7">7</button>
+            <button class="pin-key-btn" data-val="8">8</button>
+            <button class="pin-key-btn" data-val="9">9</button>
+            <button class="pin-key-btn" data-val="clear" style="font-size: 0.9rem;">C</button>
+            <button class="pin-key-btn" data-val="0">0</button>
+            <button class="pin-key-btn" data-val="back">⌫</button>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: center; margin-top: 1rem;">
+          <button class="btn btn-outline btn-sm" id="biometric-unlock-btn" onclick="triggerBiometricUnlock()" style="display: none;">
+            <span>🛡️</span> Unlock with Passkey / Biometrics
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/news.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/demo.js"></script>
+</body>
+</html>

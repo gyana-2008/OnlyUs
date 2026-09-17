@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Memories & Analytics — OUR SPACE</title>
+  
+  <link rel="stylesheet" href="/css/base.css" />
+  <link rel="stylesheet" href="/css/memories.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+</head>
+<body style="min-height: 100vh; background: var(--bg-primary);">
+
+  <!-- Top Space Bar -->
+  <header style="background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle); padding: 0.65rem 0;">
+    <div class="container flex justify-between items-center">
+      <div class="flex items-center gap-4">
+        <a href="/private.html" style="font-family: var(--font-serif); font-size: 1.15rem; font-weight: 600;">BETWEEN</a>
+        <div class="flex items-center gap-2">
+          <a href="/private.html" class="btn btn-outline btn-sm">← Space</a>
+          <a href="/chat.html" class="btn btn-outline btn-sm">Messages</a>
+          <a href="/settings.html" class="btn btn-outline btn-sm">Settings</a>
+        </div>
+      </div>
+      
+      <button class="panic-btn" onclick="API.panicDisguise()" title="Panic disguise (Esc)">
+        <span>📰</span>
+        <span>Read News (Esc)</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="container" style="padding-bottom: 5rem;">
+    
+    <!-- Memories Header & Controls -->
+    <section class="memories-header-section">
+      <div class="memories-top-row">
+        <div>
+          <h1 style="font-size: 2.2rem; margin-bottom: 0.25rem;">Our Memories</h1>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Moments, milestones, and shared stories preserved together.</p>
+        </div>
+        <button class="btn btn-primary" id="open-add-memory-btn">
+          <span>+</span> New Memory
+        </button>
+      </div>
+
+      <!-- Tag Filter Pills -->
+      <div class="memories-filter-bar">
+        <ul class="tag-pills-list">
+          <li><button class="tag-pill active" data-tag="all">All Memories</button></li>
+          <li><button class="tag-pill" data-tag="Trip">Trips</button></li>
+          <li><button class="tag-pill" data-tag="Firsts">Firsts</button></li>
+          <li><button class="tag-pill" data-tag="Date Night">Date Nights</button></li>
+          <li><button class="tag-pill" data-tag="Anniversary">Anniversary</button></li>
+          <li><button class="tag-pill" data-tag="Everyday">Everyday</button></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Relationship Analytics Strip -->
+    <section class="stats-strip">
+      <div class="stat-box">
+        <div class="stat-number" id="stat-days-together">—</div>
+        <div class="stat-label">Days Together</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number" id="stat-memories-count">0</div>
+        <div class="stat-label">Memories Saved</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number" id="stat-messages-count">0</div>
+        <div class="stat-label">Messages Exchanged</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number" id="stat-media-count">0</div>
+        <div class="stat-label">Media Exchanged</div>
+      </div>
+    </section>
+
+    <!-- Monthly Activity Chart -->
+    <section class="chart-container-card">
+      <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem; font-weight: 500;">Shared Memory Cadence</h3>
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.5rem;">Visualizing your shared moments across recent months</p>
+      
+      <div class="chart-bars-wrap" id="chart-bars-container">
+        <!-- Dynamically rendered bars -->
+      </div>
+    </section>
+
+    <!-- Memories Grid -->
+    <section>
+      <div class="memories-grid" id="memories-grid-container">
+        <!-- Rendered by memories.js -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Add Memory Modal -->
+  <div class="modal-overlay" id="add-memory-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="close-add-memory-btn">✕</button>
+      <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Add a Shared Memory</h2>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Save a cherished date, photo, and note to your timeline.</p>
+
+      <form id="add-memory-form" onsubmit="handleCreateMemory(event)">
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">Memory Title</label>
+          <input type="text" id="memory-title-input" placeholder="e.g. Picnic by the lake" style="width: 100%;" required />
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">Date</label>
+            <input type="date" id="memory-date-input" style="width: 100%;" required />
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">Category</label>
+            <select id="memory-tag-select" style="width: 100%;">
+              <option value="Everyday">Everyday</option>
+              <option value="Trip">Trip</option>
+              <option value="Firsts">Firsts</option>
+              <option value="Date Night">Date Night</option>
+              <option value="Anniversary">Anniversary</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">Story / Notes</label>
+          <textarea id="memory-story-input" rows="3" placeholder="What made this moment unforgettable?" style="width: 100%;"></textarea>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem;">Attach Photo (Optional)</label>
+          <input type="file" id="memory-file-input" accept="image/*" style="width: 100%; padding: 0.4rem;" />
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Save Memory 💕</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/memories.js"></script>
+  <script src="/js/demo.js"></script>
+</body>
+</html>
